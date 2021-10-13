@@ -1,24 +1,28 @@
 const express = require('express')
 const router = express.Router()
+const {
+  joiSchema,
+  updateFavoriteSchema,
+} = require('../../models/contacts/contacts')
+const { validation } = require('../../middlewares')
+const contactsController = require('../../controllers')
 
-router.get('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+const contactValidation = validation(joiSchema)
+const favoriteValidation = validation(updateFavoriteSchema)
+router.get('/', contactsController.getAllContacts)
 
-router.get('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.get('/:contactId', contactsController.getById)
 
-router.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.post('/', contactValidation, contactsController.createContact)
 
-router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.delete('/:contactId', contactsController.deleteContact)
 
-router.patch('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.put('/:contactId', contactValidation, contactsController.updateContact)
+
+router.patch(
+  '/:contactId/favorite',
+  favoriteValidation,
+  contactsController.updateFavorite,
+)
 
 module.exports = router
