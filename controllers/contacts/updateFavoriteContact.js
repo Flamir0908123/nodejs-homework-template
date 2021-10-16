@@ -1,33 +1,39 @@
 const { Contact } = require('../../models')
 
-const updateContact = async (req, res, next) => {
+const updateFavorite = async (req, res, next) => {
   try {
     const { contactId } = req.params
+    const { favorite } = req.body
     const contact = { contactId, owner: req.user._id }
+    console.log(contact)
+    if (favorite === undefined) {
+      return res.status(400).json({
+        message: 'missing field favorite',
+      })
+    }
     const result = await Contact.findByIdAndUpdate(
       contact.contactId,
-      req.body,
+      { favorite },
       {
         new: true,
       },
     )
     if (!result) {
-      res.status(404).json({
+      res.status(400).json({
         status: 'error',
         code: 404,
         message: `Conatct with ID=${contactId} not found`,
       })
-      return
     }
     res.json({
       status: 'success',
       code: 200,
-      message: '✔️ Contact updated',
-      data: { result },
+      message: '✔️ "Favorite" updated',
+      data: result,
     })
   } catch (error) {
     next(error)
   }
 }
 
-module.exports = updateContact
+module.exports = updateFavorite

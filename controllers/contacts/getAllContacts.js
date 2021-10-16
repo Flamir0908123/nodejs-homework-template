@@ -1,15 +1,22 @@
-const contactsOperations = require('../../model')
-// const { contactSchema } = require('../../schemas')
+const { Contact } = require('../../models')
 
 const getAllContacts = async (req, res, next) => {
   try {
-    const contacts = await contactsOperations.listContacts()
+    const { limit = 5, page = 1, favorite = null } = req.query
+    const { _id } = req.user
+    const optionSearch = { owner: _id }
+    if (favorite !== null) {
+      optionSearch.favorite = favorite
+    }
+    const { docs: contacts, ...rest } = await Contact.paginate(optionSearch, {
+      limit,
+      page,
+    })
+    // const contacts = await Contact.find({}, '_id name email phone favorite')
     res.json({
-      status: 'sucess',
+      status: 'success',
       code: 200,
-      data: {
-        result: contacts,
-      },
+      data: { contacts, ...rest },
     })
   } catch (error) {
     next(error)
